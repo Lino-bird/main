@@ -1,1 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自己紹介ページ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .intro-section {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        .form-section {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #post-container {
+            margin-top: 20px;
+        }
+        .post {
+            background-color: #fff;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .error-message {
+            color: red;
+            font-size: 14px;
+        }
+        .edit-delete-buttons {
+            margin-top: 10px;
+        }
+        .edit-delete-buttons button {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 自己紹介セクション -->
+    <div class="intro-section">
+        <h1>こんにちは!私はLINOです</h1>
+        <p>私は現在、神山まるごと高等専門学校に通う1年生です。2025年度3期生として入学し、毎日新しいことに挑戦しながら学んでいます。</p>
+        <p>好きなことは本を読むこと、自分の考えを深めること、アイデアを構想することです。また、自然(空、海、風、川など)にとても癒されています。</p>
+        <p>私の夢は、「憧れを届けるヒーロー」になることです。私にとって「憧れ」は希望であり原動力でした。それを他の人にも届け、成長を支える存在になりたいと考えています。</p>
+    </div>
 
+    <!-- 投稿フォームセクション -->
+    <div class="form-section">
+        <h2>私の気まぐれ日記</h2>
+        <form id="post-form">
+            <label for="username">LINO -アクセスを制限しています-</label><br>
+            <input type="text" id="username" name="username" required><br><br>
+
+            <label for="message">メッセージ:</label><br>
+            <textarea id="message" name="message" rows="4" cols="50" required></textarea><br><br>
+
+            <button type="submit">送信</button>
+        </form>
+
+        <div id="post-container"></div>
+        <div id="error-message" class="error-message"></div>
+    </div>
+
+    <script>
+        // 投稿を保持する配列(実際にはサーバーに保存されるべき)
+        const posts = [];
+
+        // フォーム送信時の処理
+        document.getElementById("post-form").addEventListener("submit", function(event) {
+            event.preventDefault(); // ページのリロードを防ぐ
+
+            const username = document.getElementById("username").value;
+            const message = document.getElementById("message").value;
+            const errorMessage = document.getElementById("error-message");
+
+            // "LINO"という名前が入力されているか確認
+            if (username === "LINO") {
+                // 新しい投稿を配列に追加
+                const post = {
+                    username: username,
+                    message: message
+                };
+                posts.push(post);
+
+                // 投稿を表示
+                displayPosts();
+
+                // フォームをクリア
+                document.getElementById("username").value = "";
+                document.getElementById("message").value = "";
+                errorMessage.innerHTML = ''; // エラーメッセージを消去
+            } else {
+                // 名前が"LINO"でない場合はエラーメッセージを表示
+                errorMessage.innerHTML = "送信できるのは「LINO」だけです。";
+            }
+        });
+
+        // 投稿を表示する関数
+        function displayPosts() {
+            const postContainer = document.getElementById("post-container");
+            postContainer.innerHTML = ''; // 一度すべて削除
+
+            posts.forEach((post, index) => {
+                const postElement = document.createElement("div");
+                postElement.classList.add("post");
+
+                postElement.innerHTML = `
+                    <strong>${post.username}</strong> さんの投稿:
+                    <p>${post.message}</p>
+                    <div class="edit-delete-buttons">
+                        <button onclick="editPost(${index})">編集</button>
+                        <button onclick="deletePost(${index})">削除</button>
+                    </div>
+                `;
+
+                postContainer.appendChild(postElement);
+            });
+        }
+
+        // 投稿を編集する関数
+        function editPost(index) {
+            const newMessage = prompt("新しいメッセージを入力してください:", posts[index].message);
+
+            if (newMessage !== null) {
+                posts[index].message = newMessage; // メッセージを更新
+                displayPosts(); // 投稿を再表示
+            }
+        }
+
+        // 投稿を削除する関数
+        function deletePost(index) {
+            const confirmDelete = confirm("本当に削除しますか?");
+
+            if (confirmDelete) {
+                posts.splice(index, 1); // 投稿を削除
+                displayPosts(); // 投稿を再表示
+            }
+        }
+    </script>
+</body>
+</html>
